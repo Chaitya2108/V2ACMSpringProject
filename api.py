@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, url_for, redirect, flash
 from markupsafe import escape
 import numpy as np
 import pickle
@@ -12,9 +12,11 @@ CORS(app)
 # model = pickle.load(open())
 
 
-@app.route('/')
+@app.route('/', methods=['GET','POST'])
 def hello():
-    name = request.args.get("name", "World")
+    if request.method == "POST":
+        text = request.form.get("title")
+        return redirect("output")
     return render_template('home.html')
 
 
@@ -24,6 +26,11 @@ def predict():
     features = [np.array(data['data'])]
     prediction = model.predict(features)
     return str(prediction[0])
+
+@app.route('/output')
+def output():
+    return render_template('output.html')
+
 
 if __name__ == "__main__":
     app.run(debug=True)
